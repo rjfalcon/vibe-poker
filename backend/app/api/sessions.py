@@ -1,7 +1,8 @@
 """Session import and listing endpoints."""
 from __future__ import annotations
 
-from typing import List
+import uuid
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
@@ -66,22 +67,29 @@ async def import_files(
 
         hand_texts = split_hands(text)
         if not hand_texts:
-            continue  # skip empty files silently in bulk mode
+            continue
 
-        import_session = ImportSession(filename=file.filename)
+        # Parse all hands first (CPU only, no DB)
+        parsed_hands = [_parser.parse(t) for t in hand_texts]
+        parsed_hands = [p for p in parsed_hands if p]
+
+        # Single query to find all duplicates at once
+        candidate_ids = [p.ggpoker_hand_id for p in parsed_hands]
+        existing_ids: set[str] = set(
+            row[0]
+            for row in db.query(Hand.ggpoker_hand_id)
+            .filter(Hand.ggpoker_hand_id.in_(candidate_ids))
+            .all()
+        )
+
+        import_session = ImportSession(id=str(uuid.uuid4()), filename=file.filename)
         db.add(import_session)
-        db.flush()
 
         imported = 0
-        hero_name: str | None = None
+        hero_name: Optional[str] = None
 
-        for hand_text in hand_texts:
-            parsed = _parser.parse(hand_text)
-            if not parsed:
-                continue
-
-            exists = db.query(Hand).filter_by(ggpoker_hand_id=parsed.ggpoker_hand_id).first()
-            if exists:
+        for parsed in parsed_hands:
+            if parsed.ggpoker_hand_id in existing_ids:
                 continue
 
             compute_stats(parsed)
@@ -89,7 +97,9 @@ async def import_files(
             if hero_name is None and parsed.hero_name:
                 hero_name = parsed.hero_name
 
+            hand_id = str(uuid.uuid4())
             hand = Hand(
+                id=hand_id,
                 session_id=import_session.id,
                 ggpoker_hand_id=parsed.ggpoker_hand_id,
                 table_name=parsed.table_name,
@@ -120,11 +130,10 @@ async def import_files(
                 run_it_twice=parsed.run_it_twice,
             )
             db.add(hand)
-            db.flush()
 
             for p in parsed.players:
                 db.add(HandPlayer(
-                    hand_id=hand.id,
+                    hand_id=hand_id,
                     seat=p.seat,
                     name=p.name,
                     stack_bb=p.stack_chips / parsed.stakes_bb if parsed.stakes_bb else 0.0,
@@ -135,7 +144,7 @@ async def import_files(
 
             for a in parsed.actions:
                 db.add(Action(
-                    hand_id=hand.id,
+                    hand_id=hand_id,
                     player_name=a.player_name,
                     street=a.street,
                     sequence=a.sequence,
@@ -148,10 +157,9 @@ async def import_files(
 
         import_session.hero_name = hero_name
         import_session.hand_count = imported
-        db.flush()
-        db.refresh(import_session)
         sessions_out.append(import_session)
 
+    # Single commit for all files
     db.commit()
 
     total = sum(s.hand_count for s in sessions_out)

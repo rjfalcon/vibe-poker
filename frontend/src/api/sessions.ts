@@ -12,7 +12,7 @@ export interface BulkImportResult {
   sessions: ImportSession[]
 }
 
-const BATCH_SIZE = 5
+const BATCH_SIZE = 2
 
 async function importBatch(files: File[]): Promise<BulkImportResult> {
   const form = new FormData()
