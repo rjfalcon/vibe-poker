@@ -7,16 +7,20 @@ import { cn } from '../lib/utils'
 
 export function ImportZone() {
   const [dragging, setDragging] = useState(false)
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const qc = useQueryClient()
 
   const { mutate, isPending, isSuccess, isError, error, reset, data } = useMutation({
-    mutationFn: importFiles,
+    mutationFn: (files: File[]) =>
+      importFiles(files, (done, total) => setProgress({ done, total })),
     onSuccess: () => {
+      setProgress(null)
       qc.invalidateQueries({ queryKey: ['sessions'] })
       qc.invalidateQueries({ queryKey: ['stats'] })
       qc.invalidateQueries({ queryKey: ['hands'] })
     },
+    onError: () => setProgress(null),
   })
 
   const handleFiles = useCallback(
@@ -62,7 +66,21 @@ export function ImportZone() {
         {isPending ? (
           <div className="flex flex-col items-center gap-3">
             <Spinner className="w-8 h-8" />
-            <p className="text-zinc-400">Importeren...</p>
+            {progress && progress.total > 5 ? (
+              <>
+                <p className="text-zinc-400">
+                  Bestand {progress.done} van {progress.total}...
+                </p>
+                <div className="w-48 h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-green-500 rounded-full transition-all duration-300"
+                    style={{ width: `${(progress.done / progress.total) * 100}%` }}
+                  />
+                </div>
+              </>
+            ) : (
+              <p className="text-zinc-400">Importeren...</p>
+            )}
           </div>
         ) : isSuccess ? (
           <div className="flex flex-col items-center gap-3 text-green-400">

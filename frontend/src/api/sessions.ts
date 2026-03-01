@@ -12,7 +12,9 @@ export interface BulkImportResult {
   sessions: ImportSession[]
 }
 
-export async function importFiles(files: File[]): Promise<BulkImportResult> {
+const BATCH_SIZE = 5
+
+async function importBatch(files: File[]): Promise<BulkImportResult> {
   const form = new FormData()
   for (const file of files) {
     form.append('files', file)
@@ -21,6 +23,24 @@ export async function importFiles(files: File[]): Promise<BulkImportResult> {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
   return data
+}
+
+export async function importFiles(
+  files: File[],
+  onProgress?: (done: number, total: number) => void,
+): Promise<BulkImportResult> {
+  const result: BulkImportResult = { total_hands: 0, session_count: 0, sessions: [] }
+
+  for (let i = 0; i < files.length; i += BATCH_SIZE) {
+    const batch = files.slice(i, i + BATCH_SIZE)
+    const batchResult = await importBatch(batch)
+    result.total_hands += batchResult.total_hands
+    result.session_count += batchResult.session_count
+    result.sessions.push(...batchResult.sessions)
+    onProgress?.(Math.min(i + BATCH_SIZE, files.length), files.length)
+  }
+
+  return result
 }
 
 export async function deleteSession(id: string): Promise<void> {
