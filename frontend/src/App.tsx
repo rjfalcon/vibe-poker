@@ -5,6 +5,7 @@ import { HandBrowser } from './components/HandBrowser'
 import { HandDetail } from './components/HandDetail'
 import { PositionTable } from './components/PositionTable'
 import { ImportZone } from './components/ImportZone'
+import { HelpPage } from './components/HelpPage'
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="hands/:id" element={<HandDetail />} />
           <Route path="positions" element={<PositionTable />} />
           <Route path="import" element={<ImportZone />} />
+          <Route path="help" element={<HelpPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

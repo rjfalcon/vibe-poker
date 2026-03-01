@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
-import { BarChart2, BookOpen, Grid, Upload } from 'lucide-react'
+import { BarChart2, BookOpen, Grid, HelpCircle, Upload } from 'lucide-react'
 import { cn } from '../lib/utils'
 
 const NAV = [
@@ -7,6 +7,7 @@ const NAV = [
   { to: '/hands', icon: BookOpen, label: 'Handen' },
   { to: '/positions', icon: BarChart2, label: 'Positie' },
   { to: '/import', icon: Upload, label: 'Import' },
+  { to: '/help', icon: HelpCircle, label: 'Uitleg' },
 ]
 
 export function Layout() {
