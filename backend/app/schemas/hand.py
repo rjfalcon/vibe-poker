@@ -15,6 +15,12 @@ class SessionOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class BulkImportOut(BaseModel):
+    total_hands: int
+    session_count: int
+    sessions: List[SessionOut]
+
+
 class PlayerOut(BaseModel):
     seat: int
     name: str

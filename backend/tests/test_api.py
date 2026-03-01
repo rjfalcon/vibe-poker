@@ -54,15 +54,20 @@ def client():
     return TestClient(app)
 
 
-def _upload(client: TestClient, fixture_name: str):
-    """Helper: upload a fixture file and return the JSON response."""
-    content = (FIXTURES_DIR / fixture_name).read_bytes()
-    resp = client.post(
-        "/api/sessions/import",
-        files={"file": (fixture_name, io.BytesIO(content), "text/plain")},
-    )
+def _upload(client: TestClient, *fixture_names: str):
+    """Helper: upload one or more fixture files and return the BulkImportOut JSON."""
+    files = [
+        ("files", (name, io.BytesIO((FIXTURES_DIR / name).read_bytes()), "text/plain"))
+        for name in fixture_names
+    ]
+    resp = client.post("/api/sessions/import", files=files)
     assert resp.status_code == 201, resp.text
     return resp.json()
+
+
+def _upload_first(client: TestClient, fixture_name: str) -> dict:
+    """Upload a single fixture and return the first session from the bulk result."""
+    return _upload(client, fixture_name)["sessions"][0]
 
 
 # ---------------------------------------------------------------------------
@@ -72,32 +77,40 @@ def _upload(client: TestClient, fixture_name: str):
 class TestSessionImport:
     def test_import_single_hand_file(self, client):
         data = _upload(client, "normal_hand.txt")
-        assert data["hand_count"] == 1
-        assert data["hero_name"] == "Hero"
-        assert data["filename"] == "normal_hand.txt"
-        assert "id" in data
+        assert data["total_hands"] == 1
+        assert data["session_count"] == 1
+        sess = data["sessions"][0]
+        assert sess["hand_count"] == 1
+        assert sess["hero_name"] == "Hero"
+        assert sess["filename"] == "normal_hand.txt"
+        assert "id" in sess
 
     def test_import_multi_hand_file(self, client):
         data = _upload(client, "multi_hand.txt")
-        assert data["hand_count"] == 2
+        assert data["total_hands"] == 2
 
     def test_import_fast_fold_hand(self, client):
         data = _upload(client, "fast_fold_hand.txt")
-        assert data["hand_count"] == 1
+        assert data["total_hands"] == 1
 
     def test_import_run_it_twice(self, client):
         data = _upload(client, "run_it_twice_hand.txt")
-        assert data["hand_count"] == 1
+        assert data["total_hands"] == 1
+
+    def test_import_multiple_files_at_once(self, client):
+        data = _upload(client, "normal_hand.txt", "fast_fold_hand.txt")
+        assert data["session_count"] == 2
+        assert data["total_hands"] == 2
 
     def test_duplicate_hands_are_skipped(self, client):
         _upload(client, "normal_hand.txt")
         data = _upload(client, "normal_hand.txt")
-        assert data["hand_count"] == 0  # all duplicates, nothing new imported
+        assert data["sessions"][0]["hand_count"] == 0  # all duplicates
 
     def test_non_txt_rejected(self, client):
         resp = client.post(
             "/api/sessions/import",
-            files={"file": ("hands.csv", io.BytesIO(b"data"), "text/csv")},
+            files=[("files", ("hands.csv", io.BytesIO(b"data"), "text/csv"))],
         )
         assert resp.status_code == 400
 
@@ -110,7 +123,7 @@ class TestSessionImport:
         assert len(sessions) == 2
 
     def test_get_session_by_id(self, client):
-        created = _upload(client, "normal_hand.txt")
+        created = _upload_first(client, "normal_hand.txt")
         resp = client.get(f"/api/sessions/{created['id']}")
         assert resp.status_code == 200
         assert resp.json()["id"] == created["id"]
@@ -120,10 +133,9 @@ class TestSessionImport:
         assert resp.status_code == 404
 
     def test_delete_session(self, client):
-        created = _upload(client, "normal_hand.txt")
+        created = _upload_first(client, "normal_hand.txt")
         resp = client.delete(f"/api/sessions/{created['id']}")
         assert resp.status_code == 204
-        # Confirm deleted
         resp2 = client.get(f"/api/sessions/{created['id']}")
         assert resp2.status_code == 404
 
@@ -261,7 +273,7 @@ class TestStatsEndpoints:
         assert "cumulative_bb" in points[0]
 
     def test_stats_filtered_by_session(self, client):
-        sess1 = _upload(client, "normal_hand.txt")
+        sess1 = _upload_first(client, "normal_hand.txt")
         _upload(client, "fast_fold_hand.txt")
         resp = client.get(f"/api/stats/overview?session_id={sess1['id']}")
         stats = resp.json()

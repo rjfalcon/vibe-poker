@@ -6,10 +6,18 @@ export async function listSessions(): Promise<ImportSession[]> {
   return data
 }
 
-export async function importFile(file: File): Promise<ImportSession> {
+export interface BulkImportResult {
+  total_hands: number
+  session_count: number
+  sessions: ImportSession[]
+}
+
+export async function importFiles(files: File[]): Promise<BulkImportResult> {
   const form = new FormData()
-  form.append('file', file)
-  const { data } = await client.post<ImportSession>('/sessions/import', form, {
+  for (const file of files) {
+    form.append('files', file)
+  }
+  const { data } = await client.post<BulkImportResult>('/sessions/import', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
   })
   return data

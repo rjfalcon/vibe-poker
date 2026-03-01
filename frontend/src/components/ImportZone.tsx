@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CheckCircle, Upload, XCircle } from 'lucide-react'
-import { importFile } from '../api/sessions'
+import { importFiles } from '../api/sessions'
 import { Spinner } from './ui/Spinner'
 import { cn } from '../lib/utils'
 
@@ -11,7 +11,7 @@ export function ImportZone() {
   const qc = useQueryClient()
 
   const { mutate, isPending, isSuccess, isError, error, reset, data } = useMutation({
-    mutationFn: importFile,
+    mutationFn: importFiles,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['sessions'] })
       qc.invalidateQueries({ queryKey: ['stats'] })
@@ -20,15 +20,15 @@ export function ImportZone() {
   })
 
   const handleFiles = useCallback(
-    (files: FileList | null) => {
-      if (!files?.length) return
-      const file = files[0]
-      if (!file.name.endsWith('.txt')) {
+    (fileList: FileList | null) => {
+      if (!fileList?.length) return
+      const txtFiles = Array.from(fileList).filter((f) => f.name.endsWith('.txt'))
+      if (!txtFiles.length) {
         alert('Alleen .txt bestanden worden ondersteund')
         return
       }
       reset()
-      mutate(file)
+      mutate(txtFiles)
     },
     [mutate, reset],
   )
@@ -54,6 +54,7 @@ export function ImportZone() {
           ref={inputRef}
           type="file"
           accept=".txt"
+          multiple
           className="hidden"
           onChange={(e) => handleFiles(e.target.files)}
         />
@@ -66,8 +67,17 @@ export function ImportZone() {
         ) : isSuccess ? (
           <div className="flex flex-col items-center gap-3 text-green-400">
             <CheckCircle className="w-10 h-10" />
-            <p className="font-medium">{data.hand_count} handen geïmporteerd</p>
-            <p className="text-sm text-zinc-400">{data.filename}</p>
+            <p className="font-medium">{data.total_hands} handen geïmporteerd</p>
+            <p className="text-sm text-zinc-400">
+              {data.session_count} {data.session_count === 1 ? 'bestand' : 'bestanden'}
+            </p>
+            {data.session_count > 1 && (
+              <ul className="mt-1 text-xs text-zinc-500 space-y-0.5">
+                {data.sessions.map((s) => (
+                  <li key={s.id}>{s.filename} — {s.hand_count} handen</li>
+                ))}
+              </ul>
+            )}
           </div>
         ) : isError ? (
           <div className="flex flex-col items-center gap-3 text-red-400">
@@ -80,8 +90,8 @@ export function ImportZone() {
         ) : (
           <div className="flex flex-col items-center gap-3 text-zinc-400">
             <Upload className="w-10 h-10" />
-            <p className="text-lg font-medium text-zinc-300">Sleep .txt bestand hierheen</p>
-            <p className="text-sm">of klik om te bladeren</p>
+            <p className="text-lg font-medium text-zinc-300">Sleep .txt bestanden hierheen</p>
+            <p className="text-sm">of klik om te bladeren — meerdere bestanden tegelijk mogelijk</p>
             <p className="text-xs text-zinc-600 mt-2">GGPoker Rush & Cash hand history export</p>
           </div>
         )}
@@ -93,7 +103,7 @@ export function ImportZone() {
           onClick={reset}
           className="mt-4 text-sm text-zinc-500 hover:text-zinc-300 underline"
         >
-          Nog een bestand importeren
+          Meer bestanden importeren
         </button>
       )}
 
@@ -104,7 +114,7 @@ export function ImportZone() {
           <li>Open GGPoker client → <span className="text-zinc-300">Menu → Hand History</span></li>
           <li>Selecteer de gewenste periode en tabeltype <span className="text-zinc-300">Rush & Cash</span></li>
           <li>Klik op <span className="text-zinc-300">Export</span> en sla op als <code className="text-green-400">.txt</code></li>
-          <li>Sleep het bestand naar bovenstaand veld</li>
+          <li>Sleep één of meerdere bestanden naar bovenstaand veld</li>
         </ol>
       </div>
     </div>
