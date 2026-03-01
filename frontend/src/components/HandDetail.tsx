@@ -1,6 +1,9 @@
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, BrainCircuit } from 'lucide-react'
 import { useHand } from '../hooks/useHands'
+import { analyzeHand } from '../api/analysis'
+import type { HandAnalysis } from '../api/analysis'
 import { HoleCards, PlayingCard } from './ui/PlayingCard'
 import { Badge } from './ui/Badge'
 import { Card } from './ui/Card'
@@ -10,10 +13,113 @@ import type { ActionOut } from '../types'
 
 const STREETS = ['PREFLOP', 'FLOP', 'TURN', 'RIVER'] as const
 
+const BEOORDELING_STYLE: Record<string, string> = {
+  goed:        'bg-green-900/40 text-green-400 border-green-800',
+  acceptabel:  'bg-amber-900/40 text-amber-400 border-amber-800',
+  fout:        'bg-red-900/40 text-red-400 border-red-800',
+}
+
+function ScoreBadge({ score }: { score: number }) {
+  const color = score >= 8 ? 'text-green-400' : score >= 5 ? 'text-amber-400' : 'text-red-400'
+  return (
+    <div className="flex items-center gap-1.5">
+      <span className={`text-3xl font-bold ${color}`}>{score}</span>
+      <span className="text-zinc-500 text-sm">/10</span>
+    </div>
+  )
+}
+
+function AnalysisPanel({ analysis, onReset }: { analysis: HandAnalysis; onReset: () => void }) {
+  return (
+    <div className="bg-violet-950/30 border border-violet-800/50 rounded-2xl p-5 space-y-5">
+      {/* Header */}
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-2">
+          <BrainCircuit className="w-5 h-5 text-violet-400" />
+          <span className="text-sm font-semibold text-violet-300">AI Analyse</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <ScoreBadge score={analysis.score} />
+          <button onClick={onReset} className="text-xs text-zinc-500 hover:text-zinc-300 underline">
+            verwijder
+          </button>
+        </div>
+      </div>
+
+      {/* Samenvatting */}
+      <p className="text-sm text-zinc-300 leading-relaxed">{analysis.samenvatting}</p>
+
+      {/* Per street */}
+      {Object.entries(analysis.straten).length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs text-zinc-500 uppercase tracking-wider">Per straat</p>
+          {Object.entries(analysis.straten).map(([street, s]) => {
+            if (!s) return null
+            const style = BEOORDELING_STYLE[s.beoordeling] ?? BEOORDELING_STYLE.acceptabel
+            return (
+              <div key={street} className={`border rounded-lg px-4 py-3 ${style}`}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-bold uppercase tracking-wider">{street}</span>
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-black/20 capitalize">
+                    {s.beoordeling}
+                  </span>
+                </div>
+                <p className="text-sm opacity-90 leading-relaxed">{s.uitleg}</p>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Fouten */}
+      {analysis.fouten.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs text-zinc-500 uppercase tracking-wider">
+            Verbeterpunten ({analysis.fouten.length})
+          </p>
+          {analysis.fouten.map((f, i) => (
+            <div key={i} className="bg-red-950/30 border border-red-800/50 rounded-lg px-4 py-3 space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono text-red-400 uppercase">{f.straat}</span>
+                <span className="text-xs text-zinc-400">{f.moment}</span>
+              </div>
+              <p className="text-sm text-red-300"><span className="font-medium">Probleem:</span> {f.probleem}</p>
+              <p className="text-sm text-green-300"><span className="font-medium">Beter:</span> {f.beter}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Conclusie */}
+      <div className="border-t border-violet-800/30 pt-4">
+        <p className="text-sm text-violet-200 leading-relaxed italic">{analysis.conclusie}</p>
+      </div>
+    </div>
+  )
+}
+
 export function HandDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { data: hand, isLoading, isError } = useHand(id)
+  const [analysis, setAnalysis] = useState<HandAnalysis | null>(null)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [analyzeError, setAnalyzeError] = useState<string | null>(null)
+
+  async function handleAnalyze() {
+    if (!id) return
+    setAnalyzing(true)
+    setAnalyzeError(null)
+    try {
+      const result = await analyzeHand(id)
+      setAnalysis(result)
+    } catch (e: unknown) {
+      const msg = (e as { response?: { data?: { detail?: string } } })?.response?.data?.detail
+      setAnalyzeError(msg ?? 'Analyse mislukt')
+    } finally {
+      setAnalyzing(false)
+    }
+  }
 
   if (isLoading) return <div className="flex items-center justify-center h-64"><Spinner /></div>
   if (isError || !hand) return <div className="p-6 text-red-400">Hand niet gevonden</div>
@@ -107,6 +213,26 @@ export function HandDetail() {
           ))}
         </div>
       </Card>
+
+      {/* AI Analysis button */}
+      {!analysis && (
+        <div>
+          <button
+            onClick={handleAnalyze}
+            disabled={analyzing}
+            className="flex items-center gap-2 px-4 py-2 bg-violet-700 hover:bg-violet-600 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            <BrainCircuit className="w-4 h-4" />
+            {analyzing ? 'Claude analyseert...' : 'Analyseer met AI'}
+          </button>
+          {analyzeError && (
+            <p className="mt-2 text-sm text-red-400">{analyzeError}</p>
+          )}
+        </div>
+      )}
+
+      {/* AI Analysis results */}
+      {analysis && <AnalysisPanel analysis={analysis} onReset={() => setAnalysis(null)} />}
 
       {/* Street-by-street actions */}
       <div className="space-y-3">

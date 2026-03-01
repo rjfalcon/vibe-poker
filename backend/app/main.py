@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import engine, Base
-from app.api import sessions, hands, stats
+from app.api import sessions, hands, stats, analysis
 
 # Create all tables on startup (no migration tool for MVP)
 Base.metadata.create_all(bind=engine)
@@ -28,6 +28,7 @@ app.add_middleware(
 app.include_router(sessions.router, prefix="/api")
 app.include_router(hands.router, prefix="/api")
 app.include_router(stats.router, prefix="/api")
+app.include_router(analysis.router, prefix="/api")
 
 
 @app.get("/health")
