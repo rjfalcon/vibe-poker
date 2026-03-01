@@ -1,0 +1,57 @@
+Poker Hand #HD5555555551: Hold'em No Limit ($0.05/$0.10) - 2024/01/15 20:34:00
+Table 'Rush&Cash3' 6-Max Seat #2 is the button
+Seat 1: Villain1 ($10.00 in chips)
+Seat 2: Villain2 ($10.00 in chips)
+Seat 3: Villain3 ($10.00 in chips)
+Seat 4: Hero ($10.00 in chips)
+Seat 5: Villain4 ($10.00 in chips)
+Seat 6: Villain5 ($10.00 in chips)
+Villain3: posts small blind $0.05
+Hero: posts big blind $0.10
+*** HOLE CARDS ***
+Dealt to Hero [Qs Jh]
+Villain4: folds [Fast Fold]
+Villain5: folds [Fast Fold]
+Villain1: folds
+Villain2: raises $0.20 to $0.30
+Villain3: folds
+Hero: calls $0.20
+*** FLOP *** [Qh 5c 2d]
+Hero: checks
+Villain2: bets $0.25
+Hero: calls $0.25
+*** TURN *** [Qh 5c 2d] [Jd]
+Hero: checks
+Villain2: bets $0.55
+Hero: raises $1.65 to $2.20
+Villain2: folds
+Hero collected $2.70 from pot
+*** SUMMARY ***
+Total pot $2.80 | Rake $0.10
+Board [Qh 5c 2d Jd]
+Seat 2: Villain2 (button) folded on the Turn
+Seat 4: Hero (big blind) collected ($2.70)
+
+Poker Hand #HD5555555552: Hold'em No Limit ($0.05/$0.10) - 2024/01/15 20:35:00
+Table 'Rush&Cash3' 6-Max Seat #5 is the button
+Seat 1: Villain1 ($10.00 in chips)
+Seat 2: Villain2 ($9.45 in chips)
+Seat 3: Hero ($12.35 in chips)
+Seat 4: Villain3 ($10.00 in chips)
+Seat 5: Villain4 ($10.00 in chips)
+Seat 6: Villain5 ($10.00 in chips)
+Villain4: posts small blind $0.05
+Villain5: posts big blind $0.10
+*** HOLE CARDS ***
+Dealt to Hero [Th 9h]
+Villain1: folds [Fast Fold]
+Villain2: folds [Fast Fold]
+Hero: folds [Fast Fold]
+Villain3: folds [Fast Fold]
+Villain4: raises $0.15 to $0.20
+Villain5: folds
+Villain4 collected $0.10 from pot
+*** SUMMARY ***
+Total pot $0.10 | Rake $0.00
+Seat 3: Hero folded before Flop (didn't bet)
+Seat 4: Villain4 (small blind) collected ($0.10)

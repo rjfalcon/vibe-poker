@@ -1,0 +1,27 @@
+Poker Hand #HD6666666666: Hold'em No Limit ($0.05/$0.10) - 2024/01/15 20:36:00
+Table 'Rush&Cash1' 6-Max Seat #2 is the button
+Seat 1: Villain1 ($10.00 in chips)
+Seat 2: Villain2 ($10.00 in chips)
+Seat 3: Villain3 ($10.00 in chips)
+Seat 4: Villain4 ($10.00 in chips)
+Seat 5: Hero ($10.00 in chips)
+Seat 6: Villain5 ($10.00 in chips)
+Villain3: posts small blind $0.05
+Hero: posts big blind $0.10
+*** HOLE CARDS ***
+Dealt to Hero [Qs Jh]
+Villain4: folds [Fast Fold]
+Villain5: folds [Fast Fold]
+Villain1: folds
+Villain2: raises $0.20 to $0.30
+Villain3: folds
+Hero: calls $0.20
+*** FLOP *** [Qh 5c 2d]
+Hero: checks
+Villain2: bets $0.25
+Hero: folds
+*** SUMMARY ***
+Total pot $0.65 | Rake $0.03
+Board [Qh 5c 2d]
+Seat 2: Villain2 (button) collected ($0.62)
+Seat 5: Hero (big blind) folded on the Flop

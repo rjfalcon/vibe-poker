@@ -1,0 +1,43 @@
+Poker Hand #HD3333333333: Hold'em No Limit ($0.05/$0.10) - 2024/01/15 20:32:00
+Table 'Rush&Cash1' 6-Max Seat #1 is the button
+Seat 1: Villain1 ($10.00 in chips)
+Seat 2: Hero ($10.00 in chips)
+Seat 3: Villain2 ($10.00 in chips)
+Seat 4: Villain3 ($10.00 in chips)
+Seat 5: Villain4 ($10.00 in chips)
+Seat 6: Villain5 ($10.00 in chips)
+Villain2: posts small blind $0.05
+Villain3: posts big blind $0.10
+*** HOLE CARDS ***
+Dealt to Hero [Ac Kc]
+Villain4: folds [Fast Fold]
+Villain5: folds [Fast Fold]
+Villain1: folds
+Hero: raises $0.20 to $0.30
+Villain2: folds
+Villain3: raises $0.70 to $0.80
+Hero: calls $0.50
+*** FLOP *** [Kh 8d 2s]
+Villain3: bets $0.60
+Hero: calls $0.60
+*** TURN *** [Kh 8d 2s] [Ac]
+Villain3: bets $1.20
+Hero: raises $2.80 to $4.00
+Villain3: calls $2.80
+*** RIVER *** [Kh 8d 2s Ac] [3d]
+Villain3: checks
+Hero: bets $4.60
+Villain3: calls $4.60
+*** SHOW DOWN ***
+Hero: shows [Ac Kc] (two pair, Aces and Kings)
+Villain3: shows [Kd Ks] (three of a kind, Kings)
+Villain3 collected $18.20 from pot
+*** SUMMARY ***
+Total pot $19.00 | Rake $0.80
+Board [Kh 8d 2s Ac 3d]
+Seat 1: Villain1 (button) folded before Flop (didn't bet)
+Seat 2: Hero (small blind) showed [Ac Kc] and lost
+Seat 3: Villain2 folded before Flop (didn't bet)
+Seat 4: Villain3 (big blind) showed [Kd Ks] and won ($18.20) with three of a kind, Kings
+Seat 5: Villain4 folded before Flop (didn't bet)
+Seat 6: Villain5 folded before Flop (didn't bet)

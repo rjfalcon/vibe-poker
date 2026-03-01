@@ -1,0 +1,35 @@
+Poker Hand #HD4444444444: Hold'em No Limit ($0.05/$0.10) - 2024/01/15 20:33:00
+Table 'Rush&Cash1' 6-Max Seat #4 is the button
+Seat 1: Villain1 ($10.00 in chips)
+Seat 2: Hero ($8.50 in chips)
+Seat 3: Villain2 ($10.00 in chips)
+Seat 4: Villain3 ($10.00 in chips)
+Seat 5: Villain4 ($10.00 in chips)
+Seat 6: Villain5 ($10.00 in chips)
+Villain4: posts small blind $0.05
+Villain5: posts big blind $0.10
+*** HOLE CARDS ***
+Dealt to Hero [8h 8c]
+Villain1: folds [Fast Fold]
+Hero: raises $0.20 to $0.30
+Villain2: folds [Fast Fold]
+Villain3: folds
+Villain4: folds
+Villain5: raises $0.70 to $0.80
+Hero: raises $7.70 to $8.50 and is all-in
+Villain5: calls $7.70
+*** FLOP *** [5d 6h 7c]
+*** TURN *** [5d 6h 7c] [9s]
+*** RUN IT TWICE ***
+*** FIRST RUNOUT *** [5d 6h 7c 9s] [2h]
+*** SECOND RUNOUT *** [5d 6h 7c 9s] [Ts]
+*** SHOW DOWN ***
+Hero: shows [8h 8c] (a straight, Five to Nine)
+Villain5: shows [Ah As] (a pair of Aces)
+Hero collected $8.50 from pot (first runout)
+Villain5 collected $8.50 from pot (second runout)
+*** SUMMARY ***
+Total pot $17.50 | Rake $0.50
+Board [5d 6h 7c 9s]
+Seat 2: Hero showed [8h 8c] and won ($8.50) on first runout
+Seat 6: Villain5 showed [Ah As] and won ($8.50) on second runout
