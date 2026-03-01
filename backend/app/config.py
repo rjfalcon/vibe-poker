@@ -13,5 +13,6 @@ class Settings(BaseSettings):
 
 settings = Settings()
 
-# Ensure data directory exists
-Path("data").mkdir(exist_ok=True)
+# Ensure local data directory exists (only relevant for SQLite)
+if settings.database_url.startswith("sqlite"):
+    Path("data").mkdir(exist_ok=True)
