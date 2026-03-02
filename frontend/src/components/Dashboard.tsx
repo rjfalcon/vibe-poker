@@ -1,6 +1,7 @@
 import { useOverviewStats, useTimeline } from '../hooks/useStats'
 import { StatsGrid } from './StatsGrid'
 import { WinrateChart } from './WinrateChart'
+import { BulkAnalysisPanel } from './BulkAnalysisPanel'
 
 export function Dashboard() {
   const { data: stats, isLoading: statsLoading } = useOverviewStats()
@@ -30,6 +31,7 @@ export function Dashboard() {
         <>
           <StatsGrid stats={stats} isLoading={statsLoading} />
           <WinrateChart data={timeline} isLoading={timelineLoading} />
+          <BulkAnalysisPanel />
         </>
       )}
     </div>
